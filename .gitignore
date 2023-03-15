@@ -1,0 +1,9 @@
+node_modules/
+dist/
+src/generated/
+*.env*
+*.db
+config/
+prisma/dev.db
+package-lock.json
+.vscode

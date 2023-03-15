@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+//generator pothos {
+//  provider = "prisma-pothos-types"
+//}
+
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb+srv://liquido-dev-user:2vSWBC5y9fXtWCYpassword@liquido-cluster0.7onri.mongodb.net/?retryWrites=true&w=majority"
+}
+
+// A user in our app. Is admin and member in a (at least one) team
+model LiquidoUser {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String @unique
+  mobilephone String @unique
+  lastLogin		DateTime
+  createdAt   DateTime @default(now())
+	updatedAt   DateTime @updatedAt
+	// LiquidoUser can be member or admin in several teams
+  memberIn    TeamMembers[]
+}
+
+model Team {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  teamName    String
+  inviteCode  String
+	createdAt   DateTime @default(now())
+	updatedAt   DateTime @updatedAt
+  // This is a many-to-many relation because one user can be admin or member in multiple teams.
+  members    TeamMembers[]
+}
+
+// Relation between users and teams. A user can be an admin or a member in one or more teams.
+model TeamMembers {
+	id       String       @id @default(auto()) @map("_id") @db.ObjectId
+  team     Team         @relation(fields: [teamId], references: [id])
+  teamId   String       @db.ObjectId
+  user     LiquidoUser  @relation(fields: [userId], references: [id])
+  userId   String       @db.ObjectId
+
+	role     MemberRole   @default(MEMBER)
+  joinedAt DateTime     @default(now())
+}
+
+enum MemberRole {
+	MEMBER
+	ADMIN
+}
